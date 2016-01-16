@@ -7,5 +7,6 @@
  - Themes (installed, active)
  - Users (total, per-role)
  - Content (total/published per type)
+
  
- ![screenshot](screenshot.png)
+![screenshot](screenshot.png)
