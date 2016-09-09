@@ -111,8 +111,9 @@ class WP_HUD extends WP_CLI_Command {
 	 *
 	 * @param array $args Only expects a zero-indexed value, the character to build the bar with
 	 * @param array $assoc_args array(
-	                 string 'c'  Color value. Default %p
-	                 integer 'w' Width percentage, 0-100. Default 100
+	 *               string 'c'    Color value. Default %p
+	 *               integer 'w'   Width percentage, 0-100. Default 100
+	 *               string 'text' Message to show in bar
 	 */
 	private function bar( $args = array(), $assoc_args = array() ) {
 		$char = isset( $args[0] ) ? $args[0] : '=';
