@@ -8,7 +8,6 @@ Shows these stats:
  - Drop-ins
  - Themes (installed, active)
  - Users (total, per-role)
- - Content (total/published per type)
+ - Content (total/published per type). Not shown if multisite
 
- 
 ![screenshot](screenshot.png)

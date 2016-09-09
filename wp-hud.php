@@ -25,109 +25,96 @@ class WP_HUD extends WP_CLI_Command {
 		global $wp_version;
 		WP_CLI::line( "Version: $wp_version" );
 
-		#install type
+		// install type
 		if ( is_multisite() ) {
 			if ( defined( 'SUBDOMAIN_INSTALL' ) && SUBDOMAIN_INSTALL ) {
-				WP_CLI::line('Multisite with subdomains');
+				WP_CLI::line( 'Multisite with subdomains' );
 			} else if ( defined( 'SUBDOMAIN_INSTALL' ) && ! SUBDOMAIN_INSTALL ) {
-				WP_CLI::line('Multisite with subdirectories');
+				WP_CLI::line( 'Multisite with subdirectories' );
 			}
 			$site_count = get_site_option( 'blog_count' );
 			WP_CLI::line( "$site_count sites on network" );
-
-			## HOW MANY SITES?
 		} else {
-			WP_CLI::line('Single-site');
+			WP_CLI::line( 'Single-site' );
 		}
 
-		$this->bar( '~', array('w' => 20, 'text' => 'Updates') );
+		$this->bar( '~', array( 'w' => 20, 'text' => 'Updates' ) );
 
-		#updates
+		// updates
 		$update_data = $this->wp_get_update_data();
 		if ( $update_data ) {
 			WP_CLI::line( $update_data );
 		} else {
-			WP_CLI::line( "No pending updates." );
+			WP_CLI::line( 'No pending updates.' );
 		}
 
-		$this->bar( '~', array('w' => 20, 'text' => 'Plugins') );
+		$this->bar( '~', array( 'w' => 20, 'text' => 'Plugins' ) );
 
-		#plugins
+		// plugins
 		$plugins = count( get_plugins() );
 		WP_CLI::line( "$plugins installed plugins" );
 
-		$plugins = count( get_option('active_plugins', array() ) );
+		$plugins = count( get_option( 'active_plugins', array() ) );
 		WP_CLI::line( "$plugins active plugins" );
 
 		$plugins = count( get_mu_plugins() );
 		WP_CLI::line( "$plugins mu-plugins" );
 
-		$this->bar( '~', array('w' => 20, 'text' => 'Dropins') );
+		$this->bar( '~', array( 'w' => 20, 'text' => 'Dropins' ) );
 
-		#dropins
+		// dropins
 		$dropins = array_keys( get_dropins() );
 		$dropins_count = count( $dropins );
 		WP_CLI::line( "$dropins_count drop-ins" );
-		foreach( $dropins as $di ) {
+		foreach ( $dropins as $di ) {
 			WP_CLI::line( $di );
 		}
 
-		$this->bar( '~', array('w' => 20, 'text' => 'Themes') );
+		$this->bar( '~', array( 'w' => 20, 'text' => 'Themes' ) );
 
-		#themes
+		// themes
 		$themes = count( wp_get_themes() );
 		WP_CLI::line( "$themes installed themes" );
 
 		$themes = wp_get_theme();
-		WP_CLI::line( 'Active theme: ' . $themes['Name'] );
+		WP_CLI::line( "Active theme: {$themes['Name']}" );
 
-		$this->bar( '~', array('w' => 20, 'text' => 'Users') );
+		$this->bar( '~', array( 'w' => 20, 'text' => 'Users' ) );
 
-		#users
+		// users
 		$users = count_users();
 		WP_CLI::line( "{$users['total_users']} users" );
 		$total = count( $users['avail_roles'] );
 		WP_CLI::line( "$total roles" );
-		foreach( $users['avail_roles'] as $role => $count ) {
+		foreach ( $users['avail_roles'] as $role => $count ) {
 			WP_CLI::line( "$count users in $role" );
 		}
 
-		$this->bar( '~', array('w' => 20, 'text' => 'Content') );
+		if ( ! is_multisite() ) {
+			// we're only gathering content stats for the current site, so it would be confusing to show if multisite
 
-		# content
-		$post_types = get_post_types( array( 'public' => true ), OBJECT );
-		foreach ( $post_types as $cpt ) {
-			$slug = $cpt->name;
-			$cpts = wp_count_posts( $slug );
-			$total = array_sum( (array) $cpts );
-			WP_CLI::line( "$total {$cpt->labels->name} ($cpts->publish published)" );
+			$this->bar( '~', array( 'w' => 20, 'text' => 'Content' ) );
+
+			// content
+			$post_types = get_post_types( array( 'public' => true ), OBJECT );
+			foreach ( $post_types as $cpt ) {
+				$slug = $cpt->name;
+				$cpts = wp_count_posts( $slug );
+				$total = array_sum( (array) $cpts );
+				WP_CLI::line( "$total {$cpt->labels->name} ({$cpts->publish} published)" );
+			}
 		}
 	}
 
 	/**
 	 * Create a bar that spans with width of the console
 	 *
-	 * ## OPTIONS
-	 *
-	 * [<character>]
-	 * : The character(s) to make the bar with. Default =
-	 *
-	 * [--c=<c>]
-	 * : Color for bar. Default %p
-	 *
-	 * [--w=80]
-	 * : Width percentage for bar. Default 100
-	 *
-	 *
-	 * ## EXAMPLES
-	 *
-	 *     wp hud bar
-	 *
-	 *     wp hud bar '-~' --color='%r'
-	 *
-	 *     wp hud bar '+-' --c='%r%3'
+	 * @param array $args Only expects a zero-indexed value, the character to build the bar with
+	 * @param array $assoc_args array(
+	                 string 'c'  Color value. Default %p
+	                 integer 'w' Width percentage, 0-100. Default 100
 	 */
-	function bar( $args = array(), $assoc_args = array() ) {
+	private function bar( $args = array(), $assoc_args = array() ) {
 		$char = isset( $args[0] ) ? $args[0] : '=';
 		$cols = \cli\Shell::columns();
 		if ( isset( $assoc_args['w'] ) ) {
@@ -172,8 +159,8 @@ class WP_HUD extends WP_CLI_Command {
 		$update_wordpress = get_core_updates( array('dismissed' => false) );
 		if ( ! empty( $update_wordpress ) && ! in_array( $update_wordpress[0]->response, array('development', 'latest') ))
 			$counts['wordpress'] = 1;
-     	if ( wp_get_translation_updates() )
- 			$counts['translations'] = 1;
+		if ( wp_get_translation_updates() )
+			$counts['translations'] = 1;
 
 		$titles = array();
 		if ( $counts['wordpress'] )
