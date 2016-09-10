@@ -16,8 +16,9 @@ class WP_HUD extends WP_CLI_Command {
 	 * [--format=<format>]
 	 * : Render output in a particular format.
 	 * ---
-	 * default: none
+	 * default: human
 	 * options:
+	 *   - human
 	 *   - json
 	 * ---
 	 *
@@ -65,7 +66,11 @@ class WP_HUD extends WP_CLI_Command {
 		$plugins = count( get_plugins() );
 		$store['plugins']['installed'] = $plugins;
 
-		$plugins = count( get_option( 'active_plugins', array() ) );
+		if ( is_multisite() ) {
+			$plugins = count( get_site_option( 'active_sitewide_plugins', array() ) );
+		} else {
+			$plugins = count( get_option( 'active_plugins', array() ) );
+		}
 		$store['plugins']['active'] = $plugins;
 
 		$plugins = count( get_mu_plugins() );
@@ -80,8 +85,10 @@ class WP_HUD extends WP_CLI_Command {
 		$themes = count( wp_get_themes() );
 		$store['themes']['installed'] = $themes;
 
-		$themes = wp_get_theme();
-		$store['themes']['active'] = $themes['Name'];
+		if ( ! is_multisite() ) {
+			$themes = wp_get_theme();
+			$store['themes']['active'] = $themes['Name'];
+		}
 
 		// users
 		$users = count_users();
@@ -157,7 +164,8 @@ class WP_HUD extends WP_CLI_Command {
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Plugins' ) );
 
 		WP_CLI::line( "{$store['plugins']['installed']} installed plugins" );
-		WP_CLI::line( "{$store['plugins']['active']} active plugins" );
+		$nw = is_multisite() ? 'network-' : '';
+		WP_CLI::line( "{$store['plugins']['active']} {$nw}active plugins" );
 		WP_CLI::line( "{$store['plugins']['mu']} mu-plugins" );
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Dropins' ) );
@@ -167,7 +175,9 @@ class WP_HUD extends WP_CLI_Command {
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Themes' ) );
 
 		WP_CLI::line( "{$store['themes']['installed']} installed themes" );
-		WP_CLI::line( "Active theme: {$store['themes']['active']}" );
+		if ( ! is_multisite() ) {
+			WP_CLI::line( "Active theme: {$store['themes']['active']}" );
+		}
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Users' ) );
 
