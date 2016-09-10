@@ -1,5 +1,10 @@
 # WP HUD
 
+
+```
+wp hud
+```
+
 Shows these stats:
 
  - Install (version, single/multi)
