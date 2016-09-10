@@ -13,9 +13,18 @@ class WP_HUD extends WP_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 *
+	 * [--format=<format>]
+	 * : Render output in a particular format.
+	 * ---
+	 * default: none
+	 * options:
+	 *   - json
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp hud
+	 *     wp hud --format=json
 	 *
 	 */
 	function __invoke( $args, $assoc_args ) {
@@ -62,7 +71,6 @@ class WP_HUD extends WP_CLI_Command {
 		$plugins = count( get_mu_plugins() );
 		$store['plugins']['mu'] = $plugins;
 
-
 		// dropins
 		$dropins = array_keys( get_dropins() );
 		$store['dropins']['list']      = $dropins;
@@ -75,13 +83,11 @@ class WP_HUD extends WP_CLI_Command {
 		$themes = wp_get_theme();
 		$store['themes']['active'] = $themes['Name'];
 
-
 		// users
 		$users = count_users();
 		$store['users'] = $users;
 		$store['users']['roles_list'] = array_keys( get_editable_roles() );
 		$store['users']['roles']      = count( $store['users']['roles_list'] );
-
 
 		if ( ! is_multisite() ) {
 
@@ -129,8 +135,6 @@ class WP_HUD extends WP_CLI_Command {
 		}
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Updates' ) );
-
-		// var_dump( $store['updates'] );
 
 		if ( 0 == array_sum( $store['updates'] ) ) {
 			WP_CLI::line( 'No pending updates.' );
