@@ -114,7 +114,7 @@ class WP_HUD extends WP_CLI_Command {
 		if ( isset( $assoc_args['format'] ) ) { switch ( $assoc_args['format'] ) {
 			case 'json' :
 
-				WP_CLI::line( json_encode( $store ) );
+				WP_CLI::log( json_encode( $store ) );
 				return;
 
 			break;
@@ -128,72 +128,72 @@ class WP_HUD extends WP_CLI_Command {
 
 		$this->bar( '~', array('w' => 20, 'text' => 'Install') );
 
-		WP_CLI::line( "Version: {$store['version']}" );
+		WP_CLI::log( "Version: {$store['version']}" );
 
 		if ( $store['multisite'] ) {
 			if ( $store['multisite-subdomain'] ) {
-				WP_CLI::line( 'Multisite with subdomains' );
+				WP_CLI::log( 'Multisite with subdomains' );
 			} elseif ( $store['multisite'] ) {
-				WP_CLI::line( 'Multisite with subdirectories' );
+				WP_CLI::log( 'Multisite with subdirectories' );
 			}
-			WP_CLI::line( "{$store['multisite-blogs']} sites on network" );
+			WP_CLI::log( "{$store['multisite-blogs']} sites on network" );
 		} else {
-			WP_CLI::line( 'Single-site' );
+			WP_CLI::log( 'Single-site' );
 		}
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Updates' ) );
 
 		if ( 0 == array_sum( $store['updates'] ) ) {
-			WP_CLI::line( 'No pending updates.' );
+			WP_CLI::log( 'No pending updates.' );
 		} else {
 			$counts = $store['updates'];
 			if ( $counts['wordpress'] ) {
-				WP_CLI::line( sprintf( __( '%d WordPress Update'), $counts['wordpress'] ) );
+				WP_CLI::log( sprintf( __( '%d WordPress Update'), $counts['wordpress'] ) );
 			}
 			if ( $counts['plugins'] ) {
-				WP_CLI::line( sprintf( _n( '%d Plugin Update', '%d Plugin Updates', $counts['plugins'] ), $counts['plugins'] ) );
+				WP_CLI::log( sprintf( _n( '%d Plugin Update', '%d Plugin Updates', $counts['plugins'] ), $counts['plugins'] ) );
 			}
 			if ( $counts['themes'] ) {
-				WP_CLI::line( sprintf( _n( '%d Theme Update', '%d Theme Updates', $counts['themes'] ), $counts['themes'] ) );
+				WP_CLI::log( sprintf( _n( '%d Theme Update', '%d Theme Updates', $counts['themes'] ), $counts['themes'] ) );
 			}
 			if ( $counts['translations'] ) {
-				WP_CLI::line( __( 'Translation Updates' ) );
+				WP_CLI::log( __( 'Translation Updates' ) );
 			}
 		}
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Plugins' ) );
 
-		WP_CLI::line( "{$store['plugins']['installed']} installed plugins" );
+		WP_CLI::log( "{$store['plugins']['installed']} installed plugins" );
 		$nw = is_multisite() ? 'network-' : '';
-		WP_CLI::line( "{$store['plugins']['active']} {$nw}active plugins" );
-		WP_CLI::line( "{$store['plugins']['mu']} mu-plugins" );
+		WP_CLI::log( "{$store['plugins']['active']} {$nw}active plugins" );
+		WP_CLI::log( "{$store['plugins']['mu']} mu-plugins" );
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Dropins' ) );
 
-		WP_CLI::line( "{$store['dropins']['installed']} drop-ins" );
+		WP_CLI::log( "{$store['dropins']['installed']} drop-ins" );
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Themes' ) );
 
-		WP_CLI::line( "{$store['themes']['installed']} installed themes" );
+		WP_CLI::log( "{$store['themes']['installed']} installed themes" );
 		if ( ! is_multisite() ) {
-			WP_CLI::line( "Active theme: {$store['themes']['active']}" );
+			WP_CLI::log( "Active theme: {$store['themes']['active']}" );
 		}
 
 		$this->bar( '~', array( 'w' => 20, 'text' => 'Users' ) );
 
-		WP_CLI::line( "{$store['users']['total_users']} users" );
-		WP_CLI::line( "{$store['users']['roles']} roles" );
+		WP_CLI::log( "{$store['users']['total_users']} users" );
+		WP_CLI::log( "{$store['users']['roles']} roles" );
 
 		foreach ( $store['users']['avail_roles'] as $role => $count ) {
-			WP_CLI::line( "$count users in $role" );
+			WP_CLI::log( "$count users in $role" );
 		}
 
 		if ( ! is_multisite() ) {
 
 			$this->bar( '~', array( 'w' => 20, 'text' => 'Content' ) );
 
-			WP_CLI::line( "{$store['content']['post_types']} public post types" );
-			WP_CLI::line( "{$store['content']['published']} published items" );
+			WP_CLI::log( "{$store['content']['post_types']} public post types" );
+			WP_CLI::log( "{$store['content']['published']} published items" );
 
 		}
 
@@ -230,7 +230,7 @@ class WP_HUD extends WP_CLI_Command {
 			$color = '%'. trim( $color, '%' );
 		}
 
-		WP_CLI::line( WP_CLI::colorize( $color . $line .'%n' ) );
+		WP_CLI::log( WP_CLI::colorize( $color . $line .'%n' ) );
 	}
 
 
